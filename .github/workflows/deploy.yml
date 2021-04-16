@@ -1,0 +1,48 @@
+name: GCP App Engine Deploy
+
+on:
+  push:
+    tags:
+      - v*
+
+env:
+  GCP_PROJECT: ${{ secrets.GCP_PROJECT_ID }}
+  GKE_EMAIL: ${{ secrets.GCP_SERVICE_USER_EMAIL }}
+  GITHUB_SHA: ${{ github.sha }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [ 12.x ]
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      # Setup gcloud CLI
+      - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+        with:
+          version: '270.0.0'
+          service_account_email: ${{ secrets.GCP_SERVICE_USER_EMAIL }}
+          service_account_key: ${{ secrets.GCP_SERVICE_USER_KEY }}
+
+      - name: npm install, build
+        run: |
+          npm ci
+          npm run build --if-present
+        env:
+          CI: true
+
+      - name: Test
+        run: |
+          npm run test
+
+      - name: Deploy
+        run: |
+          gcloud app deploy app.yaml --project ${GCP_PROJECT}
