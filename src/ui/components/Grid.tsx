@@ -86,8 +86,9 @@ const Grid: React.FC<IGridProps> = ({game, selectedTile, onTileClick}) => {
                     <RowLabel idx={rowIdx}/>
                 </div>
             </>)}
+            <ColumnLabels/>
         </div>
-        <ColumnLabels/>
+
         <CapturedArea capturedPieces={game.getTeamCapturedPieces(Team.white)}/>
 
     </div>
