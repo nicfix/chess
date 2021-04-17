@@ -3,7 +3,7 @@ export enum Team {
     black = 'black'
 }
 
-class Directions {
+export class Directions {
     public static N = [0, 1];
     public static NE = [1, 1];
     public static E = [1, 0];
@@ -61,30 +61,29 @@ export class Piece {
         return false;
     }
 
-    sweepDirection(game: Game, direction: number[], max: number = 7, canEatInThisDirection: boolean = true): number[][] {
+    sweepDirection(game: Game, direction: number[], maxDistance: number = 999, canEatInThisDirection: boolean = true): number[][] {
         let i = 1;
         let collision = false;
-        const moves: number[][] = [];
+        let isInTheGrid = true;
+        const moves: any = {};
 
-        while (!collision && i < max + 1) {
+        while (!collision && i < maxDistance + 1 && isInTheGrid) {
             const [x, y] = [this.currentTile.coords[0] + direction[0] * i, this.currentTile.coords[1] + direction[1] * i];
-            console.log(`checking ${[x, y]}`);
-            if (game.isInTheGrid([x, y])) {
-                const piece = game.getTile([x, y]).piece;
+            const isInTheGrid = game.isInTheGrid([x, y]);
+            if (isInTheGrid) {
+                const piece = game.getTile([x, y])?.piece;
                 collision = piece !== null;
                 if (!collision) {
-                    moves.push([x, y]);
+                    moves[`${x},${y}`] = [x, y];
                 }
 
                 if (piece?.team !== this.team && canEatInThisDirection) {
-                    moves.push([x, y]);
+                    moves[`${x},${y}`] = [x, y];
                 }
             }
             i++;
         }
-
-        console.log(moves);
-        return moves;
+        return Object.values(moves);
     }
 
     get movesCount(): number {
@@ -92,7 +91,7 @@ export class Piece {
     }
 }
 
-class Pawn extends Piece {
+export class Pawn extends Piece {
     get label(): string {
         return "p";
     }
@@ -114,16 +113,16 @@ class Pawn extends Piece {
 
         const rightDiagonal = [x + 1, y + sign];
         if (isInTheGrid(rightDiagonal)) {
-            const rightDiagonalPiece = game.getTile(rightDiagonal).piece;
-            if (rightDiagonalPiece !== null && rightDiagonalPiece.team !== this.team) {
+            const rightDiagonalPiece = game.getTile(rightDiagonal)?.piece;
+            if (rightDiagonalPiece !== null && rightDiagonalPiece?.team !== this.team) {
                 moves.push(rightDiagonal)
             }
         }
 
         const leftDiagonal = [x - 1, y + sign];
         if (isInTheGrid(leftDiagonal)) {
-            const leftDiagonalPiece = game.getTile(leftDiagonal).piece;
-            if (leftDiagonalPiece !== null && leftDiagonalPiece.team !== this.team) {
+            const leftDiagonalPiece = game.getTile(leftDiagonal)?.piece;
+            if (leftDiagonalPiece !== null && leftDiagonalPiece?.team !== this.team) {
                 moves.push(leftDiagonal)
             }
         }
@@ -132,7 +131,7 @@ class Pawn extends Piece {
     }
 }
 
-class Knight extends Piece {
+export class Knight extends Piece {
     get label(): string {
         return "k";
     }
@@ -156,7 +155,7 @@ class Knight extends Piece {
     }
 }
 
-class Queen extends Piece {
+export class Queen extends Piece {
     get label(): string {
         return "q";
     }
@@ -182,7 +181,7 @@ class Queen extends Piece {
     }
 }
 
-class Bishop extends Piece {
+export class Bishop extends Piece {
     get label(): string {
         return "b";
     }
@@ -204,7 +203,7 @@ class Bishop extends Piece {
     }
 }
 
-class Rook extends Piece {
+export class Rook extends Piece {
     moves(game: Game): number[][] {
         let moves: number[][] = [];
         const directions = [
@@ -226,7 +225,7 @@ class Rook extends Piece {
     }
 }
 
-class King extends Piece {
+export class King extends Piece {
     moves(game: Game): number[][] {
         let moves: number[][] = [];
         const directions = [
@@ -288,7 +287,7 @@ export class Game {
     public readonly tiles: Tile[] = [];
     public capturedPieces: any = {'white': [], 'black': []};
 
-    constructor() {
+    constructor(addPieces: boolean = true) {
         for (let i = 0; i < 8; i++) {
             for (let j = 0; j < 8; j++) {
                 this.tiles.push(
@@ -297,23 +296,25 @@ export class Game {
             }
         }
 
-        const buildPieces = (team: Team = Team.white) => [
-            [new Rook(team), new Knight(team), new Bishop(team), new Queen(team), new King(team), new Bishop(team), new Knight(team), new Rook(team)],
-            [new Pawn(team), new Pawn(team), new Pawn(team), new Pawn(team), new Pawn(team), new Pawn(team), new Pawn(team), new Pawn(team),]
-        ]
+        if (addPieces === true) {
+            const buildPieces = (team: Team = Team.white) => [
+                [new Rook(team), new Knight(team), new Bishop(team), new Queen(team), new King(team), new Bishop(team), new Knight(team), new Rook(team)],
+                [new Pawn(team), new Pawn(team), new Pawn(team), new Pawn(team), new Pawn(team), new Pawn(team), new Pawn(team), new Pawn(team),]
+            ]
 
-        const white = buildPieces(Team.white);
-        const black = buildPieces(Team.black);
+            const white = buildPieces(Team.white);
+            const black = buildPieces(Team.black);
 
-        white.forEach((row, rowIdx) => row.forEach((piece, pieceIdx) => {
-            const rows = this.rows;
-            rows[rowIdx][pieceIdx].piece = piece;
-        }))
+            white.forEach((row, rowIdx) => row.forEach((piece, pieceIdx) => {
+                const rows = this.rows;
+                rows[rowIdx][pieceIdx].piece = piece;
+            }))
 
-        black.forEach((row, rowIdx) => row.forEach((piece, pieceIdx) => {
-            const rows = this.rows;
-            rows[7 - rowIdx][pieceIdx].piece = piece;
-        }))
+            black.forEach((row, rowIdx) => row.forEach((piece, pieceIdx) => {
+                const rows = this.rows;
+                rows[7 - rowIdx][pieceIdx].piece = piece;
+            }))
+        }
     }
 
     get rows(): Tile[][] {
@@ -328,8 +329,12 @@ export class Game {
         return tilesMap;
     }
 
-    getTile(coords: number[]): Tile {
-        return this.rows[coords[1]][coords[0]];
+    getTile(coords: number[]): Tile | null {
+        if (this.isInTheGrid(coords)) {
+            return this.rows[coords[1]][coords[0]];
+        }
+        return null;
+
     }
 
     isInTheGrid(coords: number[]) {
@@ -343,5 +348,4 @@ export class Game {
     getTeamCapturedPieces(team: Team) {
         return this.capturedPieces[team];
     }
-
 }
