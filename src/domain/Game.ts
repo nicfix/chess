@@ -151,7 +151,8 @@ export class Knight extends Piece {
             [x + 1, y - 2],
             [x - 2, y - 1],
             [x - 1, y - 2],
-        ];
+        ].filter(coords => game.getTile(coords)?.piece == null || game.getTile(coords)?.piece?.team !== this.team);
+
     }
 }
 
@@ -334,7 +335,11 @@ export class Game {
             return this.rows[coords[1]][coords[0]];
         }
         return null;
+    }
 
+    getPiece(coords: number[]): Piece | null {
+        const tile = this.getTile(coords);
+        return (tile !== null) ? tile.piece : null;
     }
 
     isInTheGrid(coords: number[]) {

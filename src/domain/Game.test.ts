@@ -11,7 +11,7 @@ describe('A Game', () => {
         expect(aGame.tiles.filter(t => t.piece?.team === Team.white).length).toBe(16)
     });
 
-    it('should have 16 white pieces', () => {
+    it('should have 16 black pieces', () => {
         expect(aGame.tiles.filter(t => t.piece?.team === Team.black).length).toBe(16)
     });
 

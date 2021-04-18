@@ -55,8 +55,6 @@ function App() {
         <div className="App">
             <header className="App-header">
                 <h1>Turn:{currentTeam}</h1>
-
-
                 <Grid game={game} onTileClick={onTileClick} selectedTile={selectedTile}/>
             </header>
         </div>

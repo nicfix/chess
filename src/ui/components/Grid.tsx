@@ -78,11 +78,13 @@ const Grid: React.FC<IGridProps> = ({game, selectedTile, onTileClick}) => {
         <CapturedArea capturedPieces={game.getTeamCapturedPieces(Team.black)}/>
         <div style={{border: '2px solid #666666'}}>
             <ColumnLabels/>
-            {game.rows.map((row, rowIdx) => <>
+            {game.rows.reverse().map((row, rowIdx) => <>
                 <div style={{display: "flex"}} key={rowIdx}>
                     <RowLabel idx={rowIdx}/>
-                    {row.map((tile, colIdx) => <GameTile key={colIdx} tile={tile} possibleMoves={selectedPieceMoves}
-                                                         onTileClick={onTileClick}/>)}
+                    {row.map((tile, colIdx) =>
+                        <GameTile key={colIdx} tile={tile} possibleMoves={selectedPieceMoves}
+                                  onTileClick={onTileClick}/>
+                    )}
                     <RowLabel idx={rowIdx}/>
                 </div>
             </>)}
