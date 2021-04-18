@@ -1,12 +1,8 @@
-import {Game, Piece, Team, Tile} from "../../domain/Game";
+import {Game} from "../../domain/Game";
 import React from "react";
-import {library} from "@fortawesome/fontawesome-svg-core";
-import solidIcons from '@fortawesome/fontawesome-free-solid';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-
-
-// @ts-ignore
-library.add(solidIcons);
+import {Piece, Team} from "../../domain/Piece";
+import {Tile} from "../../domain/Tile";
 
 
 const Cell = ({children, style}: any) => <div style={{
@@ -32,10 +28,10 @@ const ColumnLabels = () => {
 
 const RowLabel = ({idx}: any) => <Cell>{idx + 1}</Cell>;
 
-const PieceIcon = ({piece}: any) => {
+const PieceIcon = ({piece, onClick, style}: any) => {
     if (piece !== null) {
         // @ts-ignore
-        return <FontAwesomeIcon icon={piece.icon} style={{color: piece.team}}/>
+        return <FontAwesomeIcon onClick={onClick} icon={piece.icon} style={{color: piece.team, ...style}}/>
     }
     return null;
 }
@@ -59,23 +55,43 @@ const GameTile = ({tile, possibleMoves, onTileClick}: any) => {
     </div>
 }
 
-const CapturedArea = ({capturedPieces}: any) => <div style={{display: "flex", height: "50px", marginBottom: '10px'}}>
-    {capturedPieces.map((piece: Piece, idx: number) => <PieceIcon key={idx} piece={piece}/>)}
+const CapturedArea = ({capturedPieces, currentTeam, isPromotion, onPieceClick}: any) => <div
+    style={{display: "flex", height: "50px", marginBottom: '10px'}}>
+    {capturedPieces.map((piece: Piece, idx: number) =>
+        <PieceIcon
+            style={{cursor: (piece.team === currentTeam && isPromotion) ? 'pointer' : ''}}
+            onClick={() => onPieceClick(piece)} key={idx}
+            piece={piece}/>
+    )}
 </div>
 
 
 interface IGridProps {
     game: Game;
     selectedTile?: Tile;
+    isPromotion: boolean;
+    currentTeam: Team;
     onTileClick: (tile: Tile) => void;
+    onCapturedPieceClick: (piece: Piece) => void;
 }
 
-const Grid: React.FC<IGridProps> = ({game, selectedTile, onTileClick}) => {
+const Grid: React.FC<IGridProps> = ({
+                                        game,
+                                        selectedTile,
+                                        isPromotion,
+                                        currentTeam,
+                                        onTileClick,
+                                        onCapturedPieceClick
+                                    }) => {
     const selectedPieceMoves = selectedTile?.piece?.moves(game);
 
     return <div>
-
-        <CapturedArea capturedPieces={game.getTeamCapturedPieces(Team.black)}/>
+        <CapturedArea
+            capturedPieces={game.getTeamCapturedPieces(Team.black)}
+            isPromotion={isPromotion}
+            currentTeam={currentTeam}
+            onPieceClick={onCapturedPieceClick}
+        />
         <div style={{border: '2px solid #666666'}}>
             <ColumnLabels/>
             {game.rows.reverse().map((row, rowIdx) => <>
@@ -90,9 +106,12 @@ const Grid: React.FC<IGridProps> = ({game, selectedTile, onTileClick}) => {
             </>)}
             <ColumnLabels/>
         </div>
-
-        <CapturedArea capturedPieces={game.getTeamCapturedPieces(Team.white)}/>
-
+        <CapturedArea
+            capturedPieces={game.getTeamCapturedPieces(Team.white)}
+            isPromotion={isPromotion}
+            currentTeam={currentTeam}
+            onPieceClick={onCapturedPieceClick}
+        />
     </div>
 };
 

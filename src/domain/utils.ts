@@ -1,4 +1,11 @@
-import {Bishop, Game, King, Knight, Pawn, Queen, Rook, Team} from "./Game";
+import {Game} from "./Game";
+import {Team} from "./Piece";
+import {Pawn} from "./pieces/Pawn";
+import {Knight} from "./pieces/Knight";
+import {Queen} from "./pieces/Queen";
+import {Bishop} from "./pieces/Bishop";
+import {Rook} from "./pieces/Rook";
+import {King} from "./pieces/King";
 
 export const toAllowedMoves: (gameMap: string[][]) => number[][] = (gameMap: string[][]) => {
     const expectedMoves: number[][] = [];

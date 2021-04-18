@@ -1,4 +1,4 @@
-import {areEqual, buildGame, toAllowedMoves} from "./utils";
+import {areEqual, buildGame, toAllowedMoves} from "../utils";
 
 describe('A Knight', () => {
     it('should be able to move any number of squares along a rank or file', () => {

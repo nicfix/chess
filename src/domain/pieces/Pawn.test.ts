@@ -1,4 +1,4 @@
-import {areEqual, buildGame, isIn, toAllowedMoves} from "./utils";
+import {areEqual, buildGame, isIn, toAllowedMoves} from "../utils";
 
 describe('A Pawn', () => {
     it('should be able to move two squares forward at the first move', () => {

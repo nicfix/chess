@@ -1,4 +1,4 @@
-import {areEqual, buildGame, toAllowedMoves} from "./utils";
+import {areEqual, buildGame, toAllowedMoves} from "../utils";
 
 describe('A Queen', () => {
     it('should be able to move any number of squares along a rank or file and any number of squares diagonally', () => {

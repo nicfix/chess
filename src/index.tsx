@@ -3,6 +3,10 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import {library} from "@fortawesome/fontawesome-svg-core";
+import solidIconsPack from '@fortawesome/fontawesome-free-solid';
+// @ts-ignore
+library.add(solidIconsPack);
 
 ReactDOM.render(
   <React.StrictMode>
