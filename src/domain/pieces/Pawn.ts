@@ -53,7 +53,9 @@ export class Pawn extends Piece {
         const movement = tile.coords[1] - originalTile.coords[1];
         const distance = Math.abs(movement);
 
+
         if (distance === 2 && moved) {
+            // With this move, the piece is the new en-passant potential victim
             const sign = movement / distance;
             const enPassantTileCoords = [originalTile.coords[0], originalTile.coords[1] + sign];
             game.enPassantTile = game.getTile(enPassantTileCoords);
@@ -64,11 +66,11 @@ export class Pawn extends Piece {
     }
 
     enPassant(game: Game, tile: Tile): boolean {
+        const enPassantPiece = game.enPassantPiece;
         const moved = super.move(game, tile);
-        const piece = game.enPassantPiece;
-        if (piece !== null) {
-            piece.currentTile.piece = null;
-            game.capturePiece(piece)
+        if (enPassantPiece !== null) {
+            enPassantPiece.currentTile.piece = null;
+            game.capturePiece(enPassantPiece)
         }
         return moved;
     }

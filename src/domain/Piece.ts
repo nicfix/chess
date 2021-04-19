@@ -19,8 +19,7 @@ export class Directions {
 }
 
 export class Piece {
-
-    // eslint-disable-next-line @typescript-eslint/no-use-before-define
+    
     public currentTile: Tile = new Tile(0, 0);
     private _movesCount: number = 0;
 

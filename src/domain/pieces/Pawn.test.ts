@@ -42,7 +42,7 @@ describe('A Pawn', () => {
         const aPawn = aGame.getPiece([4, 4]);
         const firstMoveTile = aGame.getTile([4, 5]);
         //@ts-ignore
-        aPawn?.move(aGame, firstMoveTile);
+        aGame.moveTo(aPawn, firstMoveTile);
 
         const expectedMoves = toAllowedMoves(expectedGameMap);
         const calculatedMoves = aPawn?.moves(aGame) || [];
@@ -128,7 +128,7 @@ describe('A Pawn', () => {
         const enPassantTile = aGame.getTile([5, 4]);
 
         // @ts-ignore
-        enPassantPawn?.move(aGame, enPassantTile);
+        aGame.moveTo(enPassantPawn, enPassantTile);
 
         const aPawn = aGame.getPiece([4, 4]);
 

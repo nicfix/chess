@@ -78,4 +78,8 @@ export class Game {
     getTeamCapturedPieces(team: Team) {
         return this.capturedPieces[team];
     }
+
+    moveTo(piece: Piece, tile: Tile): boolean {
+        return piece.move(this, tile);
+    }
 }
