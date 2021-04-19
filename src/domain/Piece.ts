@@ -53,17 +53,20 @@ export class Piece {
         return false;
     }
 
-    move(game: Game, tile: Tile): boolean {
+    move(game: Game, tile: Tile, clearEnPassant: boolean = true): boolean {
         if (this.isLegalMove(game, tile)) {
-            if(tile.piece!==null){
+            if (tile.piece !== null) {
                 game.capturePiece(tile.piece);
             }
             this.currentTile.piece = null;
             tile.piece = this;
             this._movesCount += 1;
+            if (clearEnPassant) {
+                game.enPassantPiece = null;
+                game.enPassantTile = null;
+            }
             return true;
         }
-
         return false;
     }
 

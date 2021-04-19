@@ -69,10 +69,10 @@ describe('A Pawn', () => {
             ["__", "__", "__", "__", "__", "__", "__", "__"]
         ]
         const aGame = buildGame(expectedGameMap);
-        const aRook = aGame.getPiece([4, 4]);
+        const aPawn = aGame.getPiece([4, 4]);
 
         const expectedMoves = toAllowedMoves(expectedGameMap);
-        const calculatedMoves = aRook?.moves(aGame) || [];
+        const calculatedMoves = aPawn?.moves(aGame) || [];
 
         expect(areEqual(expectedMoves, calculatedMoves)).toBeTruthy();
     });
@@ -100,10 +100,40 @@ describe('A Pawn', () => {
             ["__", "__", "__", "__", "__", "__", "__", "__"]
         ]
         const aGame = buildGame(expectedGameMap);
-        const aRook = aGame.getPiece([4, 4]);
+        const aPawn = aGame.getPiece([4, 4]);
 
         const expectedMoves = toAllowedMoves(expectedAllowedMoves);
-        const calculatedMoves = aRook?.moves(aGame) || [];
+        const calculatedMoves = aPawn?.moves(aGame) || [];
+
+        expect(areEqual(expectedMoves, calculatedMoves)).toBeTruthy();
+    });
+
+    it('should be able to capture an enemy en-passant', () => {
+        // https://it.wikipedia.org/wiki/En_passant
+        const expectedGameMap = [
+            ["__", "__", "__", "__", "__", "__", "__", "__"],
+            ["__", "__", "__", "__", "__", "__", "__", "__"],
+            ["__", "__", "__", "__", "__", "__", "__", "__"],
+            ["__", "__", "__", "__", "__", "__", "__", "__"],
+            ["__", "__", "__", "__", "wp", "__", "__", "__"],
+            ["__", "__", "__", "__", "AM", "AM", "__", "__"],
+            ["__", "__", "__", "__", "AM", "bp", "__", "__"],
+            ["__", "__", "__", "__", "__", "__", "__", "__"]
+        ]
+
+
+        const aGame = buildGame(expectedGameMap);
+
+        const enPassantPawn = aGame.getTile([5, 6])?.piece || null;
+        const enPassantTile = aGame.getTile([5, 4]);
+
+        // @ts-ignore
+        enPassantPawn?.move(aGame, enPassantTile);
+
+        const aPawn = aGame.getPiece([4, 4]);
+
+        const expectedMoves = toAllowedMoves(expectedGameMap);
+        const calculatedMoves = aPawn?.moves(aGame) || [];
 
         expect(areEqual(expectedMoves, calculatedMoves)).toBeTruthy();
     });

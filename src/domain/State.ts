@@ -13,9 +13,6 @@ interface IMoveData {
 interface IStateData {
     selectedTile?: Tile | undefined;
     target?: Tile | undefined;
-    canDoCastling?: boolean;
-    canDoPromotion?: boolean;
-    canDoEnPassant?: boolean;
     currentTeam: Team,
     game: Game
 }
@@ -70,7 +67,6 @@ export class MoveState extends State {
                 return new PromotionState({...this.data, selectedTile: clickedTile});
             }
         }
-
 
         return new SelectPieceState(
             {

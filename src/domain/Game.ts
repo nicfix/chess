@@ -10,6 +10,8 @@ import {King} from "./pieces/King";
 export class Game {
     public readonly tiles: Tile[] = [];
     public capturedPieces: any = {'white': [], 'black': []};
+    public enPassantTile: Tile | null = null;
+    public enPassantPiece: Piece | null = null;
 
     constructor(addPieces: boolean = true) {
         for (let i = 0; i < 8; i++) {
