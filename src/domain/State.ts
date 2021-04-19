@@ -41,13 +41,13 @@ export class MoveState extends State {
         }
 
         const piece = tile.piece;
-
+        const selectedPiece = selectedTile?.piece || null;
         const playerClickedOnAnotherOfHisPieces = piece !== null && piece.team === currentTeam;
         if (playerClickedOnAnotherOfHisPieces) {
             return new MoveState({...this.data, selectedTile: tile})
         }
 
-        if (piece !== null && game.moveTo(piece, tile)) {
+        if (selectedPiece !== null && game.moveTo(selectedPiece, tile)) {
             return this.nextOnMove(moveData);
         }
 
