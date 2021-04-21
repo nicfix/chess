@@ -35,39 +35,51 @@ export class Pawn extends Piece {
             }
         }
 
-        if (game.enPassantTile !== null &&
-            game.enPassantPiece !== null &&
-            game.enPassantPiece.team !== this.team &&
-            game.enPassantPiece.currentTile.coords[1] === this.currentTile.coords[1] &&
-            Math.abs(game.enPassantPiece.currentTile.coords[0] - this.currentTile.coords[0]) === 1
-        ) {
-            moves.push(game.enPassantTile.coords);
+        const canEnPassant = this.canEnPassant(game);
+        const enPassantCoords = this.getEnPassantTile(game)?.coords;
+
+        if (canEnPassant && enPassantCoords) {
+            moves.push(enPassantCoords);
         }
 
         return moves;
     }
 
     move(game: Game, tile: Tile): boolean {
-        const originalTile = this.currentTile;
-        const moved = (tile === game.enPassantTile) ? this.enPassant(game, tile) : super.move(game, tile);
-        const movement = tile.coords[1] - originalTile.coords[1];
-        const distance = Math.abs(movement);
+        return (this.canEnPassant(game)) ? this.enPassant(game, tile) : super.move(game, tile);
+    }
 
+    canEnPassant(game: Game) {
+        if (game.history.length === 0) return false;
+        const lastMove = game.history[0];
+        return lastMove.isEnPassant() &&
+            lastMove.targetTile.coords[1] === this.currentTile.coords[1] &&
+            Math.abs(lastMove.targetTile.coords[0] - this.currentTile.coords[0]) === 1
+    }
 
-        if (distance === 2 && moved) {
-            // With this move, the piece is the new en-passant potential victim
-            const sign = movement / distance;
-            const enPassantTileCoords = [originalTile.coords[0], originalTile.coords[1] + sign];
-            game.enPassantTile = game.getTile(enPassantTileCoords);
-            game.enPassantPiece = this;
-        }
+    getEnPassantTile(game: Game): Tile | null {
+        if (game.history.length === 0) return null;
+        const lastMove = game.history[0];
+        const distance = lastMove.targetTile.coords[1] - lastMove.startTile.coords[1];
+        if (distance === 0) return null;
+        const sign = distance / Math.abs(distance);
 
-        return moved;
+        const tileCoords = [
+            lastMove.targetTile.coords[0],
+            lastMove.targetTile.coords[1] - sign
+        ];
+        return game.getTile(tileCoords);
+    }
+
+    getEnPassantPiece(game: Game): Piece | null {
+        if (game.history.length === 0) return null;
+        const lastMove = game.history[0];
+        return lastMove.piece;
     }
 
     enPassant(game: Game, tile: Tile): boolean {
-        const enPassantPiece = game.enPassantPiece;
         const moved = super.move(game, tile);
+        const enPassantPiece = this.getEnPassantPiece(game);
         if (enPassantPiece !== null) {
             enPassantPiece.currentTile.piece = null;
             game.capturePiece(enPassantPiece)

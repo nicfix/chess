@@ -19,7 +19,7 @@ export class Directions {
 }
 
 export class Piece {
-    
+
     public currentTile: Tile = new Tile(0, 0);
     private _movesCount: number = 0;
 
@@ -52,7 +52,7 @@ export class Piece {
         return false;
     }
 
-    move(game: Game, tile: Tile, clearEnPassant: boolean = true): boolean {
+    move(game: Game, tile: Tile): boolean {
         if (this.isLegalMove(game, tile)) {
             if (tile.piece !== null) {
                 game.capturePiece(tile.piece);
@@ -60,10 +60,6 @@ export class Piece {
             this.currentTile.piece = null;
             tile.piece = this;
             this._movesCount += 1;
-            if (clearEnPassant) {
-                game.enPassantPiece = null;
-                game.enPassantTile = null;
-            }
             return true;
         }
         return false;

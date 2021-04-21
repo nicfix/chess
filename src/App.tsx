@@ -5,6 +5,7 @@ import Grid from "./ui/components/Grid";
 import {Piece, Team} from "./domain/Piece";
 import {Tile} from "./domain/Tile";
 import {PromotionState, SelectPieceState} from "./domain/State";
+import History from "./ui/components/History";
 
 function App() {
     const [state, setState] = useState(
@@ -29,16 +30,28 @@ function App() {
     return (
         <div className="App">
             <header className="App-header">
-                <h1>Turn: {currentTeam} player</h1>
-                <h2>{state.label()}</h2>
-                <Grid
-                    currentTeam={currentTeam}
-                    isPromotion={isPromotion}
-                    game={game}
-                    onTileClick={onTileClick}
-                    selectedTile={selectedTile}
-                    onCapturedPieceClick={onCapturedPieceClick}
-                />
+                <div style={{display: 'flex', alignItems: "space-between"}}>
+                    <div style={{
+                        marginRight: "50px",
+                        width: "400px",
+                        textAlign: "left"
+                    }}>
+                        <h3>History</h3>
+                        <History game={game}/>
+                    </div>
+                    <div>
+                        <h3>{currentTeam} player:<br/> {state.label()}</h3>
+                        <Grid
+                            currentTeam={currentTeam}
+                            isPromotion={isPromotion}
+                            game={game}
+                            onTileClick={onTileClick}
+                            selectedTile={selectedTile}
+                            onCapturedPieceClick={onCapturedPieceClick}
+                        />
+                    </div>
+
+                </div>
             </header>
         </div>
     );

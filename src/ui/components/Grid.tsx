@@ -56,7 +56,7 @@ const GameTile = ({tile, possibleMoves, onTileClick}: any) => {
 }
 
 const CapturedArea = ({capturedPieces, currentTeam, isPromotion, onPieceClick}: any) => <div
-    style={{display: "flex", height: "50px", marginBottom: '10px'}}>
+    style={{display: "flex", marginBottom: '20px', marginTop: '20px'}}>
     {capturedPieces.map((piece: Piece, idx: number) =>
         <PieceIcon
             style={{cursor: (piece.team === currentTeam && isPromotion) ? 'pointer' : ''}}

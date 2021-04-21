@@ -6,12 +6,13 @@ import {Queen} from "./pieces/Queen";
 import {Bishop} from "./pieces/Bishop";
 import {Rook} from "./pieces/Rook";
 import {King} from "./pieces/King";
+import {Move} from "./Move";
 
 export class Game {
     public readonly tiles: Tile[] = [];
     public capturedPieces: any = {'white': [], 'black': []};
-    public enPassantTile: Tile | null = null;
-    public enPassantPiece: Piece | null = null;
+
+    public readonly history: Move[] = [];
 
     constructor(addPieces: boolean = true) {
         for (let i = 0; i < 8; i++) {
@@ -80,6 +81,13 @@ export class Game {
     }
 
     moveTo(piece: Piece, tile: Tile): boolean {
-        return piece.move(this, tile);
+        const startTile = piece.currentTile;
+        const didMove = piece.move(this, tile);
+        if (didMove) {
+            this.history.unshift(
+                new Move(startTile, piece, tile)
+            )
+        }
+        return didMove;
     }
 }

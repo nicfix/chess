@@ -121,7 +121,6 @@ describe('A Pawn', () => {
             ["__", "__", "__", "__", "__", "__", "__", "__"]
         ]
 
-
         const aGame = buildGame(expectedGameMap);
 
         const enPassantPawn = aGame.getTile([5, 6])?.piece || null;
