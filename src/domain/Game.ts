@@ -11,6 +11,7 @@ import {Move} from "./Move";
 export class Game {
     public readonly tiles: Tile[] = [];
     public capturedPieces: any = {'white': [], 'black': []};
+    public readonly pieces: any = {'white': [], 'black': []};
 
     public readonly history: Move[] = [];
 
@@ -89,5 +90,13 @@ export class Game {
             )
         }
         return didMove;
+    }
+
+    forceMoveTo(piece: Piece, tile: Tile) {
+        const rookStart = piece.currentTile;
+        tile.piece = piece;
+        piece.currentTile = tile;
+        rookStart.piece = null;
+        this.history.unshift(new Move(rookStart, piece, tile));
     }
 }

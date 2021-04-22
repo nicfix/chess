@@ -17,7 +17,7 @@ export class Bishop extends Piece {
             Directions.SE,
             Directions.SW,
             Directions.NW,
-        ]
+        ];
         directions.forEach((direction) => moves = moves.concat(this.sweepDirection(game, direction)));
         return moves;
     }

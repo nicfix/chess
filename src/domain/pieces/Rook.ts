@@ -9,7 +9,7 @@ export class Rook extends Piece {
             Directions.E,
             Directions.S,
             Directions.W,
-        ]
+        ];
         directions.forEach((direction) => moves = moves.concat(this.sweepDirection(game, direction)));
         return moves;
     }
