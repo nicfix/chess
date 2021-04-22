@@ -259,6 +259,24 @@ describe('A King', () => {
         expect(areEqual(expectedMoves, calculatedMoves)).toBeTruthy();
     });
 
+    it('also the king can check', () => {
+        const expectedGameMap = [
+            ["__", "__", "__", "__", "__", "__", "__", "__"],
+            ["__", "__", "__", "__", "__", "__", "__", "__"],
+            ["__", "__", "__", "__", "__", "__", "__", "__"],
+            ["__", "__", "__", "__", "__", "__", "__", "__"],
+            ["__", "__", "__", "__", "__", "__", "__", "__"],
+            ["__", "__", "__", "__", "__", "__", "__", "__"],
+            ["__", "__", "__", "wK", "__", "__", "__", "__"],
+            ["__", "__", "__", "__", "bK", "__", "__", "__"]
+        ];
+        const aGame = buildGame(expectedGameMap);
+        const aKing = aGame.getPiece([4, 7]);
+
+        // @ts-ignore
+        expect(aKing.isInCheck(aGame)).toBeTruthy();
+    });
+
     it('a castling move should move the rook', () => {
         const expectedGameMap = [
             ["wr", "AM", "AM", "wK", "AM", "__", "__", "wr"],

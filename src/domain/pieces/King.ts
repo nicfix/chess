@@ -109,8 +109,14 @@ export class King extends Piece {
         game.tiles.forEach(tile => {
             if (tile.piece !== null && tile.piece?.team !== this.team && !(tile.piece instanceof King)) {
                 if (isIn(tile.piece.moves(game), this.currentTile.coords)) {
-                    inCheck = true;
+                    inCheck = inCheck || true;
                 }
+            }
+
+            if (tile.piece instanceof King) {
+                const distance = (a: number, b: number) => Math.abs(a - b);
+                inCheck = inCheck || distance(tile.coords[0], this.currentTile.coords[0]) === 1 ||
+                    distance(tile.coords[1], this.currentTile.coords[1]) === 1;
             }
         });
         return inCheck;
