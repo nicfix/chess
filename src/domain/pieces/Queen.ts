@@ -1,13 +1,13 @@
-import {Game} from "../Game";
-import {Directions, Piece} from "../Piece";
+import { Game } from '../Game';
+import { Directions, Piece } from '../Piece';
 
 export class Queen extends Piece {
     get label(): string {
-        return "q";
+        return 'q';
     }
 
     get icon(): string {
-        return "chess-queen"
+        return 'chess-queen';
     }
 
     moves(game: Game): number[][] {
@@ -20,9 +20,16 @@ export class Queen extends Piece {
             Directions.S,
             Directions.SW,
             Directions.W,
-            Directions.NW
+            Directions.NW,
         ];
-        directions.forEach((direction) => moves = moves.concat(this.sweepDirection(game, direction)));
+        directions.forEach(
+            (direction) =>
+                (moves = moves.concat(this.sweepDirection(game, direction)))
+        );
         return moves;
+    }
+
+    clone(): Piece {
+        return new Queen(this.team, this.movesCount);
     }
 }

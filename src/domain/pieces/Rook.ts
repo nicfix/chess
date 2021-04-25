@@ -1,5 +1,5 @@
-import {Game} from "../Game";
-import {Directions, Piece} from "../Piece";
+import { Game } from '../Game';
+import { Directions, Piece } from '../Piece';
 
 export class Rook extends Piece {
     moves(game: Game): number[][] {
@@ -10,15 +10,22 @@ export class Rook extends Piece {
             Directions.S,
             Directions.W,
         ];
-        directions.forEach((direction) => moves = moves.concat(this.sweepDirection(game, direction)));
+        directions.forEach(
+            (direction) =>
+                (moves = moves.concat(this.sweepDirection(game, direction)))
+        );
         return moves;
     }
 
     get label(): string {
-        return "r";
+        return 'r';
     }
 
     get icon(): string {
-        return "chess-rook"
+        return 'chess-rook';
+    }
+
+    clone(): Piece {
+        return new Rook(this.team, this.movesCount);
     }
 }

@@ -1,13 +1,9 @@
-import {Piece} from "./Piece";
+import { Piece } from './Piece';
 
 export class Tile {
     private _piece: Piece | null = null;
 
-    constructor(
-        readonly x: number,
-        readonly y: number
-    ) {
-    }
+    constructor(readonly x: number, readonly y: number) {}
 
     get coords(): [number, number] {
         return [this.x, this.y];
@@ -25,9 +21,13 @@ export class Tile {
     }
 
     get coordsLabels(): [string, number] {
-        const labels = [
-            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'
-        ]
-        return [labels[this.x], this.y + 1]
+        const labels = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+        return [labels[this.x], this.y + 1];
+    }
+
+    clone(): Tile {
+        const clone = new Tile(this.x, this.y);
+        clone.piece = this.piece?.clone() || null;
+        return clone;
     }
 }

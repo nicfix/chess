@@ -300,4 +300,63 @@ describe('A King', () => {
         expect(aRook?.currentTile.coords).toStrictEqual([2, 0]);
     });
 
+    it('should be able to detect check mate', () => {
+        const expectedGameMap = [
+            ["wK", "__", "__", "__", "__", "__", "__", "__"],
+            ["__", "__", "__", "__", "__", "__", "__", "__"],
+            ["bK", "__", "bb", "bb", "__", "__", "__", "__"],
+            ["__", "__", "__", "__", "__", "__", "__", "__"],
+            ["__", "__", "__", "__", "__", "__", "__", "__"],
+            ["__", "__", "__", "__", "__", "__", "__", "__"],
+            ["__", "__", "__", "__", "__", "__", "__", "__"],
+            ["__", "__", "__", "__", "__", "__", "__", "__"]
+        ];
+        const aGame = buildGame(expectedGameMap);
+        const aKing = aGame.getPiece([0, 0]);
+
+
+        // @ts-ignore
+        expect(aKing.isInCheckMate(aGame)).toBeTruthy();
+    });
+
+    it('should be able to detect if another piece can save him from check mate', () => {
+        // The knight can move between the black rook and the white King
+        const expectedGameMap = [
+            ["wK", "wk", "__", "__", "__", "__", "__", "__"],
+            ["__", "wp", "__", "__", "__", "__", "__", "__"],
+            ["__", "__", "__", "__", "__", "__", "__", "__"],
+            ["__", "__", "__", "__", "__", "__", "__", "__"],
+            ["__", "__", "__", "__", "__", "__", "__", "__"],
+            ["__", "__", "__", "__", "__", "__", "__", "__"],
+            ["__", "__", "__", "__", "__", "__", "__", "__"],
+            ["br", "__", "__", "__", "__", "__", "__", "__"]
+        ];
+        const aGame = buildGame(expectedGameMap);
+        const aKing = aGame.getPiece([0, 0]);
+
+
+        // @ts-ignore
+        expect(aKing.isInCheckMate(aGame)).toBeFalsy();
+    });
+
+    it('should be able to detect the king can save himself from check mate', () => {
+        // The knight can move between the black rook and the white King
+        const expectedGameMap = [
+            ["wK", "__", "__", "__", "__", "__", "__", "__"],
+            ["__", "__", "__", "__", "__", "__", "__", "__"],
+            ["__", "__", "__", "__", "__", "__", "__", "__"],
+            ["__", "__", "__", "__", "__", "__", "__", "__"],
+            ["__", "__", "__", "__", "__", "__", "__", "__"],
+            ["__", "__", "__", "__", "__", "__", "__", "__"],
+            ["__", "__", "__", "__", "__", "__", "__", "__"],
+            ["br", "__", "__", "__", "__", "__", "__", "__"]
+        ];
+        const aGame = buildGame(expectedGameMap);
+        const aKing = aGame.getPiece([0, 0]);
+
+
+        // @ts-ignore
+        expect(aKing.isInCheckMate(aGame)).toBeFalsy();
+    });
+
 });

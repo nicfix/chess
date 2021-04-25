@@ -1,7 +1,7 @@
-import {Game} from "./Game";
-import {Tile} from "./Tile";
-import {Piece, Team} from "./Piece";
-import {Pawn} from "./pieces/Pawn";
+import { Game } from './Game';
+import { Tile } from './Tile';
+import { Piece, Team } from './Piece';
+import { Pawn } from './pieces/Pawn';
 
 interface IMoveData {
     clickedTile?: Tile | undefined;
@@ -13,18 +13,15 @@ interface IMoveData {
 interface IStateData {
     selectedTile?: Tile | undefined;
     target?: Tile | undefined;
-    currentTeam: Team,
-    game: Game
+    currentTeam: Team;
+    game: Game;
 }
 
 export default class State {
-    constructor(
-        public readonly data: IStateData
-    ) {
-    }
+    constructor(public readonly data: IStateData) {}
 
     next(moveData: IMoveData): State {
-        throw new Error("Not implemented, use a concrete implementation");
+        throw new Error('Not implemented, use a concrete implementation');
     }
 
     label(): string {
@@ -34,7 +31,7 @@ export default class State {
 
 export class MoveState extends State {
     next(moveData: IMoveData): State {
-        const {currentTeam, selectedTile, game} = this.data;
+        const { currentTeam, selectedTile, game } = this.data;
         const tile = moveData.clickedTile;
         if (tile === undefined) {
             return this;
@@ -42,9 +39,10 @@ export class MoveState extends State {
 
         const piece = tile.piece;
         const selectedPiece = selectedTile?.piece || null;
-        const playerClickedOnAnotherOfHisPieces = piece !== null && piece.team === currentTeam;
+        const playerClickedOnAnotherOfHisPieces =
+            piece !== null && piece.team === currentTeam;
         if (playerClickedOnAnotherOfHisPieces) {
-            return new MoveState({...this.data, selectedTile: tile})
+            return new MoveState({ ...this.data, selectedTile: tile });
         }
 
         if (selectedPiece !== null && game.moveTo(selectedPiece, tile)) {
@@ -56,36 +54,65 @@ export class MoveState extends State {
     }
 
     protected nextOnMove(moveData: IMoveData): State {
-        const {currentTeam, game} = this.data;
-        const {clickedTile} = moveData;
+        const { currentTeam, game } = this.data;
+        const { clickedTile } = moveData;
+
+        if (
+            game
+                .getKing(currentTeam === Team.white ? Team.black : Team.white)
+                .isInCheckMate(game)
+        ) {
+            return new CheckMateState({
+                game: this.data.game,
+                currentTeam:
+                    currentTeam === Team.white ? Team.black : Team.white,
+            });
+        }
+
+        if (
+            game
+                .getKing(currentTeam === Team.white ? Team.black : Team.white)
+                .isInCheck(game)
+        ) {
+            return new CheckState({
+                game: this.data.game,
+                currentTeam:
+                    currentTeam === Team.white ? Team.black : Team.white,
+            });
+        }
+
+
 
         if (clickedTile?.piece instanceof Pawn) {
-            const isLastRank = (currentTeam === Team.white && clickedTile?.y === 7) ||
-                (currentTeam === Team.black && clickedTile?.y === 0)
+            const isLastRank =
+                (currentTeam === Team.white && clickedTile?.y === 7) ||
+                (currentTeam === Team.black && clickedTile?.y === 0);
 
-            const teamHasCapturedPieces = game.getTeamCapturedPieces(currentTeam).length > 0;
+            const teamHasCapturedPieces =
+                game.getTeamCapturedPieces(currentTeam).length > 0;
 
             if (isLastRank && teamHasCapturedPieces) {
-                return new PromotionState({...this.data, selectedTile: clickedTile});
+                return new PromotionState({
+                    ...this.data,
+                    selectedTile: clickedTile,
+                });
             }
         }
 
-        return new SelectPieceState(
-            {
-                game: this.data.game,
-                currentTeam: (currentTeam === Team.white) ? Team.black : Team.white
-            }
-        )
+        return new SelectPieceState({
+            game: this.data.game,
+            currentTeam: currentTeam === Team.white ? Team.black : Team.white,
+        });
     }
 
     label(): string {
-        return "Move";
+        return 'Move';
     }
 }
 
 export class SelectPieceState extends State {
     next(moveData: IMoveData): State {
-        const {clickedTile} = moveData;
+        const { clickedTile } = moveData;
 
         if (clickedTile === undefined) {
             return this;
@@ -96,20 +123,19 @@ export class SelectPieceState extends State {
             return this;
         }
 
-        return new MoveState({...this.data, selectedTile: clickedTile});
+        return new MoveState({ ...this.data, selectedTile: clickedTile });
     }
 
     label(): string {
-        return "Select a piece";
+        return 'Select a piece';
     }
 }
 
 export class PromotionState extends State {
-
     next(moveData: IMoveData): State {
-        const {currentTeam, selectedTile, game} = this.data;
+        const { currentTeam, selectedTile, game } = this.data;
 
-        const {promotedPiece} = moveData;
+        const { promotedPiece } = moveData;
         if (selectedTile !== undefined && promotedPiece !== undefined) {
             selectedTile.piece = promotedPiece;
             const capturedPieces = game.getTeamCapturedPieces(currentTeam);
@@ -117,15 +143,25 @@ export class PromotionState extends State {
             capturedPieces.splice(index, 1);
         }
 
-        return new SelectPieceState(
-            {
-                game: this.data.game,
-                currentTeam: (currentTeam === Team.white) ? Team.black : Team.white
-            }
-        )
+        return new SelectPieceState({
+            game: this.data.game,
+            currentTeam: currentTeam === Team.white ? Team.black : Team.white,
+        });
     }
 
     label(): string {
-        return "Promote your pawn";
+        return 'Promote your pawn';
+    }
+}
+
+export class CheckState extends SelectPieceState {
+    label(): string {
+        return 'Check!';
+    }
+}
+
+export class CheckMateState extends SelectPieceState {
+    label(): string {
+        return 'Check mate!';
     }
 }

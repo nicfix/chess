@@ -1,8 +1,8 @@
-import {Game} from "../Game";
-import {Directions, Piece, Team} from "../Piece";
-import {isIn} from "../utils";
-import {Rook} from "./Rook";
-import {Tile} from "../Tile";
+import { Game } from '../Game';
+import { Directions, Piece, Team } from '../Piece';
+import { isIn } from '../utils';
+import { Rook } from './Rook';
+import { Tile } from '../Tile';
 
 export class King extends Piece {
     moves(game: Game): number[][] {
@@ -15,24 +15,29 @@ export class King extends Piece {
             Directions.S,
             Directions.SW,
             Directions.W,
-            Directions.NW
+            Directions.NW,
         ];
-        directions.forEach((direction) => moves = moves.concat(this.sweepDirection(game, direction, 1)));
+        directions.forEach(
+            (direction) =>
+                (moves = moves.concat(this.sweepDirection(game, direction, 1)))
+        );
         return moves.concat(this.getCastlingMoves(game));
     }
 
-    canRookCastle(rookCoords: number[], game: Game) {
+    canRookCastle(rookCoords: number[], game: Game): boolean {
         const piece = game.getTile(rookCoords)?.piece;
         if (piece !== null && piece instanceof Rook && piece.movesCount === 0) {
             const distance = rookCoords[0] - this.currentTile.coords[0];
             const sign = distance / Math.abs(distance);
-            let isFree = true;
+            let directionIsFree = true;
             let x = this.currentTile.coords[0] + sign;
             while (x !== rookCoords[0]) {
-                isFree = isFree && game.getTile([x, rookCoords[1]])?.piece === null;
+                directionIsFree =
+                    directionIsFree &&
+                    game.getTile([x, rookCoords[1]])?.piece === null;
                 x += sign;
             }
-            return isFree;
+            return directionIsFree;
         }
         return false;
     }
@@ -41,14 +46,18 @@ export class King extends Piece {
         return Math.abs(targetKingCoords[0] - startKingCoords[0]) === 2;
     }
 
-    getCastlingRook(startKingCoords: number[], targetKingCoords: number[], game: Game): Rook | null {
-        const y = (this.team === Team.white) ? 0 : 7;
+    getCastlingRook(
+        startKingCoords: number[],
+        targetKingCoords: number[],
+        game: Game
+    ): Rook | null {
+        const y = this.team === Team.white ? 0 : 7;
         const rookCoords = [
             [0, y],
-            [7, y]
+            [7, y],
         ];
         let rook: Rook | null = null;
-        rookCoords.forEach(coords => {
+        rookCoords.forEach((coords) => {
             const distance = coords[0] - startKingCoords[0];
             const sign = distance / Math.abs(distance);
             const castlingDistance = targetKingCoords[0] - startKingCoords[0];
@@ -56,7 +65,7 @@ export class King extends Piece {
             if (sign === castlingSign) {
                 rook = game.getPiece(coords);
             }
-        })
+        });
         return rook;
     }
 
@@ -64,23 +73,29 @@ export class King extends Piece {
         if (this.isInCheck(game) || this.movesCount !== 0) {
             return [];
         }
-        const y = (this.team === Team.white) ? 0 : 7;
+        const y = this.team === Team.white ? 0 : 7;
         const rookCoords = [
             [0, y],
-            [7, y]
+            [7, y],
         ];
         const moves: number[][] = [];
-        rookCoords.forEach(coords => {
+        rookCoords.forEach((coords) => {
             if (this.canRookCastle(coords, game)) {
                 const distance = coords[0] - this.currentTile.coords[0];
                 const sign = distance / Math.abs(distance);
-                moves.push([this.currentTile.coords[0] + 2 * sign, this.currentTile.coords[1]]);
+                moves.push([
+                    this.currentTile.coords[0] + 2 * sign,
+                    this.currentTile.coords[1],
+                ]);
             }
         });
         return moves;
     }
 
-    getCastlingRookTarget(startKingCoords: number[], targetKingCoords: number[]): number[] {
+    getCastlingRookTarget(
+        startKingCoords: number[],
+        targetKingCoords: number[]
+    ): number[] {
         const distance = targetKingCoords[0] - startKingCoords[0];
         const sign = distance / Math.abs(distance);
         return [startKingCoords[0] + sign, startKingCoords[1]];
@@ -90,8 +105,14 @@ export class King extends Piece {
         const startKingCoords = this.currentTile.coords;
         let moved = super.move(game, tile);
         if (this.isCastling(startKingCoords, tile.coords)) {
-            const rook = this.getCastlingRook(startKingCoords, tile.coords, game);
-            const rookTarget = game.getTile(this.getCastlingRookTarget(startKingCoords, tile.coords));
+            const rook = this.getCastlingRook(
+                startKingCoords,
+                tile.coords,
+                game
+            );
+            const rookTarget = game.getTile(
+                this.getCastlingRookTarget(startKingCoords, tile.coords)
+            );
             if (rook !== null && rookTarget !== null) {
                 game.forceMoveTo(rook, rookTarget);
             }
@@ -106,8 +127,12 @@ export class King extends Piece {
      */
     isInCheck(game: Game): boolean {
         let inCheck = false;
-        game.tiles.forEach(tile => {
-            if (tile.piece !== null && tile.piece?.team !== this.team && !(tile.piece instanceof King)) {
+        game.tiles.forEach((tile) => {
+            if (
+                tile.piece !== null &&
+                tile.piece?.team !== this.team &&
+                !(tile.piece instanceof King)
+            ) {
                 if (isIn(tile.piece.moves(game), this.currentTile.coords)) {
                     inCheck = inCheck || true;
                 }
@@ -115,7 +140,10 @@ export class King extends Piece {
 
             if (tile.piece instanceof King) {
                 const distance = (a: number, b: number) => Math.abs(a - b);
-                inCheck = inCheck || distance(tile.coords[0], this.currentTile.coords[0]) === 1 ||
+                inCheck =
+                    inCheck ||
+                    distance(tile.coords[0], this.currentTile.coords[0]) ===
+                        1 ||
                     distance(tile.coords[1], this.currentTile.coords[1]) === 1;
             }
         });
@@ -127,14 +155,48 @@ export class King extends Piece {
      * @param game
      */
     isInCheckMate(game: Game): boolean {
-        return false;
+        const isStillInCheckAfterMove = (
+            piece: Piece,
+            move: number[],
+            game: Game
+        ) => {
+            const gameSimulationAfterMove = game.simulateMove(piece, move);
+            return gameSimulationAfterMove
+                .getKing(this.team)
+                .isInCheck(gameSimulationAfterMove);
+        };
+
+        // Bruteforce implementation
+        const sameTeamPieces: (Piece | null)[] = game.tiles
+            .filter(
+                (tile: Tile) =>
+                    tile.piece?.team === this.team && tile.piece !== null
+            )
+            .map((tile) => tile.piece);
+
+        for (let i = 0; i < sameTeamPieces.length; i++) {
+            const piece = sameTeamPieces[i];
+            if (piece !== null) {
+                const moves = piece?.moves(game) || [];
+                for (let j = 0; j < moves.length; j++) {
+                    if (!isStillInCheckAfterMove(piece, moves[j], game)) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     get icon(): string {
-        return "chess-king"
+        return 'chess-king';
     }
 
     get label(): string {
-        return "K";
+        return 'K';
+    }
+
+    clone(): Piece {
+        return new King(this.team, this.movesCount);
     }
 }
