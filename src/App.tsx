@@ -53,7 +53,6 @@ function App() {
                         <History game={game} />
                     </div>
                     <div>
-
                         <Grid
                             currentTeam={currentTeam}
                             isPromotion={isPromotion}

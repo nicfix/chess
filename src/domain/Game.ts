@@ -182,6 +182,13 @@ export class Game {
         return pieceMoves;
     }
 
+    /**
+     * Returns true if the piece can move to the tile.
+     * Returns false otherwise.
+     * @param piece:Piece the piece to move
+     * @param tile:Tile the tile to move to
+     * @returns boolean
+     */
     isAllowedMove(piece: Piece, tile: Tile): boolean {
         const [x, y] = tile.coords;
         return (
@@ -286,6 +293,19 @@ export class Game {
             this.getTeamCapturedPieces(team).length > 0;
 
         return (passedTeamIsTheLastWhoMoved && pieceIsAPawn && targetTileIsOnLastRank && passedTeamHasCapturedPieces);
+    }
+
+    /**
+     * Promotes a pawn to a piece from the captured ones.
+     * @param piece: Piece, a piece from the captured ones
+     * @param tile: Tile the tile to place the new piece
+     * @param team: Team, the team
+     */
+    promote(piece: Piece, tile: Tile, team: Team) {
+        tile.piece = piece;
+        const capturedPieces = this.getTeamCapturedPieces(team);
+        const index = capturedPieces.indexOf(piece);
+        capturedPieces.splice(index, 1);
     }
 
     /**

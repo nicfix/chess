@@ -186,12 +186,12 @@ describe('A Game', () => {
         const anotherGameClone = anotherGame.clone();
         const startingCoords = [0, 1];
         const targetCoords = [0, 2];
-        const clonedPawn = anotherGameClone.getPiece(startingCoords);
+        const clonedPawn = anotherGameClone.getPiece(startingCoords) as Pawn;
+        const clonedTile = anotherGameClone.getTile(targetCoords) as Tile;
 
         anotherGameClone.moveTo(
-            // @ts-ignore
             clonedPawn,
-            anotherGameClone.getTile(targetCoords)
+            clonedTile
         );
 
         expect(anotherGameClone.getTile(startingCoords)?.piece).toBeNull();

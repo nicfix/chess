@@ -124,14 +124,24 @@ export class SelectPieceState extends State {
 export class PromotionState extends State {
     next(moveData: IMoveData): State {
         const { currentTeam, selectedTile, game } = this.data;
-
         const { promotedPiece } = moveData;
-        // Move this inside the Game class
+        const oppositeTeam = currentTeam === Team.white ? Team.black : Team.white;
         if (selectedTile !== undefined && promotedPiece !== undefined) {
-            selectedTile.piece = promotedPiece;
-            const capturedPieces = game.getTeamCapturedPieces(currentTeam);
-            const index = capturedPieces.indexOf(promotedPiece);
-            capturedPieces.splice(index, 1);
+            game.promote(promotedPiece, selectedTile, currentTeam);
+        }
+
+        if (game.isInCheckMate(oppositeTeam)) {
+            return new CheckMateState({
+                game: this.data.game,
+                currentTeam: oppositeTeam
+            });
+        }
+
+        if (game.isInCheck(oppositeTeam)) {
+            return new SelectPieceInCheckState({
+                game: this.data.game,
+                currentTeam: oppositeTeam
+            });
         }
 
         return new SelectPieceState({
@@ -166,8 +176,15 @@ export class MovePieceInCheckState extends MoveState {
     }
 }
 
-export class CheckMateState extends SelectPieceState {
+export class CheckMateState extends State {
     label(): string {
-        return 'Check mate!';
+        const oppositeTeam = this.data.currentTeam === Team.white ? Team.black : Team.white;
+        return `Check mate! Player ${oppositeTeam} wins`;
+    }
+
+    next(moveData: IMoveData): State {
+        const oppositeTeam = this.data.currentTeam === Team.white ? Team.black : Team.white;
+        alert(`Player ${oppositeTeam} wins, no more moves allowed.`);
+        return this;
     }
 }

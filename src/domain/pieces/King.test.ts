@@ -1,5 +1,7 @@
 import { areEqual, buildGame, toAllowedMoves } from '../utils';
 import { King } from './King';
+import { Rook } from './Rook';
+import { Tile } from '../Tile';
 
 describe('A King', () => {
     it('should be able to move any number of squares along a rank or file', () => {
@@ -87,10 +89,8 @@ describe('A King', () => {
             ['__', '__', '__', 'bq', '', '__', '__', '__']
         ];
         const aGame = buildGame(expectedGameMap);
-        const aKing = aGame.getPiece([3, 0]);
+        const aKing = aGame.getPiece([3, 0]) as King;
 
-
-        // @ts-ignore
         expect(aKing.isInCheck(aGame)).toBeTruthy();
     });
 
@@ -186,13 +186,11 @@ describe('A King', () => {
             ['__', '__', '__', '__', '__', '__', '__', '__']
         ];
         const aGame = buildGame(expectedGameMap);
-        const aKing = aGame.getPiece([3, 0]);
-        const aRook = aGame.getPiece([7, 0]);
+        const aKing = aGame.getPiece([3, 0]) as King;
+        const aRook = aGame.getPiece([7, 0]) as Rook;
 
-        // @ts-ignore
-        aGame.moveTo(aRook, aGame.getTile([7, 1]));
-        // @ts-ignore
-        aGame.moveTo(aRook, aGame.getTile([7, 0]));
+        aGame.moveTo(aRook, aGame.getTile([7, 1]) as Tile);
+        aGame.moveTo(aRook, aGame.getTile([7, 0]) as Tile);
 
         const expectedMoves = toAllowedMoves(expectedGameMap);
         const calculatedMoves = aKing?.moves(aGame) || [];
@@ -272,9 +270,8 @@ describe('A King', () => {
             ['__', '__', '__', '__', 'bK', '__', '__', '__']
         ];
         const aGame = buildGame(expectedGameMap);
-        const aKing = aGame.getPiece([4, 7]);
+        const aKing = aGame.getPiece([4, 7]) as King;
 
-        // @ts-ignore
         expect(aKing.isInCheck(aGame)).toBeTruthy();
     });
 
@@ -290,11 +287,11 @@ describe('A King', () => {
             ['__', '__', '__', '__', '__', '__', '__', '__']
         ];
         const aGame = buildGame(expectedGameMap);
-        const aKing = aGame.getPiece([3, 0]);
-        const aRook = aGame.getPiece([0, 0]);
+        const aKing = aGame.getPiece([3, 0]) as King;
+        const aRook = aGame.getPiece([0, 0]) as Rook;
 
-        // @ts-ignore
-        aGame.moveTo(aKing, aGame.getTile([1, 0]));
+
+        aGame.moveTo(aKing, aGame.getTile([1, 0]) as Tile);
 
 
         expect(aKing?.currentTile.coords).toStrictEqual([1, 0]);
@@ -331,10 +328,8 @@ describe('A King', () => {
             ['br', '__', '__', '__', '__', '__', '__', '__']
         ];
         const aGame = buildGame(expectedGameMap);
-        const aKing = aGame.getPiece([0, 0]);
+        const aKing = aGame.getPiece([0, 0]) as King;
 
-
-        // @ts-ignore
         expect(aKing.isInCheckMate(aGame)).toBeFalsy();
     });
 
@@ -351,10 +346,10 @@ describe('A King', () => {
             ['br', '__', '__', '__', '__', '__', '__', '__']
         ];
         const aGame = buildGame(expectedGameMap);
-        const aKing = aGame.getPiece([0, 0]);
+        const aKing = aGame.getPiece([0, 0]) as King;
 
 
-        // @ts-ignore
+
         expect(aKing.isInCheckMate(aGame)).toBeFalsy();
     });
 

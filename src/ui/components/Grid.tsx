@@ -30,7 +30,6 @@ const RowLabel = ({ idx }: any) => <Cell>{8 - idx}</Cell>;
 
 const PieceIcon = ({ piece, onClick, style }: any) => {
     if (piece !== null) {
-        // @ts-ignore
         return <FontAwesomeIcon onClick={onClick} icon={piece.icon} style={{ color: piece.team, ...style }} />;
     }
     return null;
