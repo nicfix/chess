@@ -41,7 +41,7 @@ function App() {
                         width: '400px',
                         textAlign: 'left'
                     }}>
-                        <h3>PiecesChecking</h3>
+                        <h3>Pieces Checking</h3>
                         <PiecesChecking game={game} currentTeam={currentTeam} />
                     </div>
                     <div style={{

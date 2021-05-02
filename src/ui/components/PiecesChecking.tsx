@@ -28,7 +28,7 @@ const PiecesChecking: React.FC<IHistoryProps> = ({ game, currentTeam }) => {
                         </tbody>
                     </table>
                 </div> :
-                <p>No pieces are checking {currentTeam} king!</p>
+                <p>No pieces are checking the {currentTeam} king!</p>
         }
     </>;
 };
