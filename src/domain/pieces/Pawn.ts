@@ -59,8 +59,8 @@ export class Pawn extends Piece {
     }
 
     canEnPassant(game: Game) {
-        if (game.history.length === 0) return false;
-        const lastMove = game.history[0];
+        if (game.movesHistory.length === 0) return false;
+        const lastMove = game.movesHistory[0];
         return (
             lastMove.isEnPassant() &&
             lastMove.targetTile.coords[1] === this.currentTile.coords[1] &&
@@ -71,8 +71,8 @@ export class Pawn extends Piece {
     }
 
     getEnPassantTile(game: Game): Tile | null {
-        if (game.history.length === 0) return null;
-        const lastMove = game.history[0];
+        if (game.movesHistory.length === 0) return null;
+        const lastMove = game.movesHistory[0];
         const distance =
             lastMove.targetTile.coords[1] - lastMove.startTile.coords[1];
         if (distance === 0) return null;
@@ -86,8 +86,8 @@ export class Pawn extends Piece {
     }
 
     getEnPassantPiece(game: Game): Piece | null {
-        if (game.history.length === 0) return null;
-        const lastMove = game.history[0];
+        if (game.movesHistory.length === 0) return null;
+        const lastMove = game.movesHistory[0];
         return lastMove.piece;
     }
 

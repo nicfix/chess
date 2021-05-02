@@ -37,32 +37,14 @@ export class Piece {
         return [];
     }
 
-    isLegalMove(game: Game, tile: Tile): boolean {
-        const [x, y] = tile.coords;
-        return (
-            this.moves(game).find((c) => c[0] === x && c[1] === y) !== undefined
-        );
-    }
-
-    capture(game: Game, tile: Tile): boolean {
-        if (this.isLegalMove(game, tile) && tile.piece !== null) {
-            this.move(game, tile);
-            return true;
-        }
-        return false;
-    }
-
     move(game: Game, tile: Tile): boolean {
-        if (this.isLegalMove(game, tile)) {
-            if (tile.piece !== null) {
-                game.capturePiece(tile.piece);
-            }
-            this.currentTile.piece = null;
-            tile.piece = this;
-            this._movesCount += 1;
-            return true;
+        if (tile.piece !== null) {
+            game.capturePiece(tile.piece);
         }
-        return false;
+        this.currentTile.piece = null;
+        tile.piece = this;
+        this._movesCount += 1;
+        return true;
     }
 
     sweepDirection(
@@ -79,7 +61,7 @@ export class Piece {
         while (!collision && i < maxDistance + 1 && isInTheGrid) {
             const [x, y] = [
                 this.currentTile.coords[0] + direction[0] * i,
-                this.currentTile.coords[1] + direction[1] * i,
+                this.currentTile.coords[1] + direction[1] * i
             ];
             const isInTheGrid = game.isInTheGrid([x, y]);
 

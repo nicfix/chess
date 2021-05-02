@@ -1,11 +1,9 @@
 import { Game } from './Game';
 import { Tile } from './Tile';
 import { Piece, Team } from './Piece';
-import { Pawn } from './pieces/Pawn';
 
 interface IMoveData {
     clickedTile?: Tile | undefined;
-    castling?: boolean;
     enPassant?: boolean;
     promotedPiece?: Piece;
 }
@@ -18,7 +16,8 @@ interface IStateData {
 }
 
 export default class State {
-    constructor(public readonly data: IStateData) {}
+    constructor(public readonly data: IStateData) {
+    }
 
     next(moveData: IMoveData): State {
         throw new Error('Not implemented, use a concrete implementation');
@@ -30,6 +29,7 @@ export default class State {
 }
 
 export class MoveState extends State {
+
     next(moveData: IMoveData): State {
         const { currentTeam, selectedTile, game } = this.data;
         const tile = moveData.clickedTile;
@@ -41,76 +41,66 @@ export class MoveState extends State {
         const selectedPiece = selectedTile?.piece || null;
         const playerClickedOnAnotherOfHisPieces =
             piece !== null && piece.team === currentTeam;
+
         if (playerClickedOnAnotherOfHisPieces) {
-            return new MoveState({ ...this.data, selectedTile: tile });
+            return this.clone({ ...this.data, selectedTile: tile });
         }
 
         if (selectedPiece !== null && game.moveTo(selectedPiece, tile)) {
-            return this.nextOnMove(moveData);
+            return this.onMoveSuccess(moveData);
         }
 
         alert(`Invalid move`);
         return this;
     }
 
-    protected nextOnMove(moveData: IMoveData): State {
+    protected onMoveSuccess(moveData: IMoveData): State {
         const { currentTeam, game } = this.data;
         const { clickedTile } = moveData;
+        const oppositeTeam = currentTeam === Team.white ? Team.black : Team.white;
 
-        if (
-            game
-                .getKing(currentTeam === Team.white ? Team.black : Team.white)
-                .isInCheckMate(game)
-        ) {
+        if (game.canPromote(currentTeam)) {
+            return new PromotionState({
+                ...this.data,
+                selectedTile: clickedTile
+            });
+        }
+
+        if (game.isInCheckMate(oppositeTeam)) {
             return new CheckMateState({
                 game: this.data.game,
-                currentTeam:
-                    currentTeam === Team.white ? Team.black : Team.white,
+                currentTeam: oppositeTeam
             });
         }
 
-        if (
-            game
-                .getKing(currentTeam === Team.white ? Team.black : Team.white)
-                .isInCheck(game)
-        ) {
-            return new CheckState({
+        if (game.isInCheck(oppositeTeam)) {
+            return new SelectPieceInCheckState({
                 game: this.data.game,
-                currentTeam:
-                    currentTeam === Team.white ? Team.black : Team.white,
+                currentTeam: oppositeTeam
             });
-        }
-
-
-
-        if (clickedTile?.piece instanceof Pawn) {
-            const isLastRank =
-                (currentTeam === Team.white && clickedTile?.y === 7) ||
-                (currentTeam === Team.black && clickedTile?.y === 0);
-
-            const teamHasCapturedPieces =
-                game.getTeamCapturedPieces(currentTeam).length > 0;
-
-            if (isLastRank && teamHasCapturedPieces) {
-                return new PromotionState({
-                    ...this.data,
-                    selectedTile: clickedTile,
-                });
-            }
         }
 
         return new SelectPieceState({
             game: this.data.game,
-            currentTeam: currentTeam === Team.white ? Team.black : Team.white,
+            currentTeam: oppositeTeam
         });
     }
 
     label(): string {
         return 'Move';
     }
+
+    clone(stateData: IStateData): MoveState {
+        return new MoveState(stateData);
+    }
 }
 
 export class SelectPieceState extends State {
+
+    getMoveState(data: IStateData): State {
+        return new MoveState(data);
+    }
+
     next(moveData: IMoveData): State {
         const { clickedTile } = moveData;
 
@@ -123,7 +113,7 @@ export class SelectPieceState extends State {
             return this;
         }
 
-        return new MoveState({ ...this.data, selectedTile: clickedTile });
+        return this.getMoveState({ ...this.data, selectedTile: clickedTile });
     }
 
     label(): string {
@@ -136,6 +126,7 @@ export class PromotionState extends State {
         const { currentTeam, selectedTile, game } = this.data;
 
         const { promotedPiece } = moveData;
+        // Move this inside the Game class
         if (selectedTile !== undefined && promotedPiece !== undefined) {
             selectedTile.piece = promotedPiece;
             const capturedPieces = game.getTeamCapturedPieces(currentTeam);
@@ -145,7 +136,7 @@ export class PromotionState extends State {
 
         return new SelectPieceState({
             game: this.data.game,
-            currentTeam: currentTeam === Team.white ? Team.black : Team.white,
+            currentTeam: currentTeam === Team.white ? Team.black : Team.white
         });
     }
 
@@ -154,9 +145,24 @@ export class PromotionState extends State {
     }
 }
 
-export class CheckState extends SelectPieceState {
+export class SelectPieceInCheckState extends SelectPieceState {
+
+    getMoveState(data: IStateData): State {
+        return new MovePieceInCheckState(data);
+    }
+
     label(): string {
-        return 'Check!';
+        return 'Check! Save the king';
+    }
+}
+
+export class MovePieceInCheckState extends MoveState {
+    label(): string {
+        return 'Check! Save the king';
+    }
+
+    clone(stateData: IStateData): MoveState {
+        return new MovePieceInCheckState(stateData);
     }
 }
 

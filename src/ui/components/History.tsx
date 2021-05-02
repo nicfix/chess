@@ -12,7 +12,7 @@ const History: React.FC<IHistoryProps> = ({game}) => <>
     }}>
         <table>
             <tbody>
-            {game.history.map(move =>
+            {game.movesHistory.map(move =>
                 <tr>
                     <td>{move.piece.team[0]}{move.piece.label}</td>
                     <td>{move.startTile.coordsLabels}</td>

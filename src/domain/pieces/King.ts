@@ -15,7 +15,7 @@ export class King extends Piece {
             Directions.S,
             Directions.SW,
             Directions.W,
-            Directions.NW,
+            Directions.NW
         ];
         directions.forEach(
             (direction) =>
@@ -42,7 +42,7 @@ export class King extends Piece {
         return false;
     }
 
-    isCastling(startKingCoords: number[], targetKingCoords: number[]): boolean {
+    isCastlingMove(startKingCoords: number[], targetKingCoords: number[]): boolean {
         return Math.abs(targetKingCoords[0] - startKingCoords[0]) === 2;
     }
 
@@ -54,7 +54,7 @@ export class King extends Piece {
         const y = this.team === Team.white ? 0 : 7;
         const rookCoords = [
             [0, y],
-            [7, y],
+            [7, y]
         ];
         let rook: Rook | null = null;
         rookCoords.forEach((coords) => {
@@ -76,7 +76,7 @@ export class King extends Piece {
         const y = this.team === Team.white ? 0 : 7;
         const rookCoords = [
             [0, y],
-            [7, y],
+            [7, y]
         ];
         const moves: number[][] = [];
         rookCoords.forEach((coords) => {
@@ -85,7 +85,7 @@ export class King extends Piece {
                 const sign = distance / Math.abs(distance);
                 moves.push([
                     this.currentTile.coords[0] + 2 * sign,
-                    this.currentTile.coords[1],
+                    this.currentTile.coords[1]
                 ]);
             }
         });
@@ -102,16 +102,18 @@ export class King extends Piece {
     }
 
     move(game: Game, tile: Tile): boolean {
-        const startKingCoords = this.currentTile.coords;
+        const initialKingCoords = this.currentTile.coords;
+        const destinationKingCoords = tile.coords;
         let moved = super.move(game, tile);
-        if (this.isCastling(startKingCoords, tile.coords)) {
+
+        if (this.isCastlingMove(initialKingCoords, destinationKingCoords)) {
             const rook = this.getCastlingRook(
-                startKingCoords,
-                tile.coords,
+                initialKingCoords,
+                destinationKingCoords,
                 game
             );
             const rookTarget = game.getTile(
-                this.getCastlingRookTarget(startKingCoords, tile.coords)
+                this.getCastlingRookTarget(initialKingCoords, destinationKingCoords)
             );
             if (rook !== null && rookTarget !== null) {
                 game.forceMoveTo(rook, rookTarget);
@@ -126,7 +128,12 @@ export class King extends Piece {
      * @param game
      */
     isInCheck(game: Game): boolean {
-        let inCheck = false;
+        const piecesChecking = this.piecesChecking(game);
+        return piecesChecking.length > 0;
+    }
+
+    piecesChecking(game: Game): Piece[] {
+        const piecesInCheck: Piece[] = [];
         game.tiles.forEach((tile) => {
             if (
                 tile.piece !== null &&
@@ -134,20 +141,20 @@ export class King extends Piece {
                 !(tile.piece instanceof King)
             ) {
                 if (isIn(tile.piece.moves(game), this.currentTile.coords)) {
-                    inCheck = inCheck || true;
+                    piecesInCheck.push(tile.piece);
                 }
             }
 
-            if (tile.piece instanceof King) {
-                const distance = (a: number, b: number) => Math.abs(a - b);
-                inCheck =
-                    inCheck ||
-                    distance(tile.coords[0], this.currentTile.coords[0]) ===
-                        1 ||
-                    distance(tile.coords[1], this.currentTile.coords[1]) === 1;
+            if (tile.piece instanceof King && tile.piece.team !== this.team) {
+                const linearDistance = (a: number, b: number) => Math.abs(a - b);
+                const horizontalDistance = linearDistance(tile.coords[0], this.currentTile.coords[0]);
+                const verticalDistance = linearDistance(tile.coords[1], this.currentTile.coords[1]);
+                if (horizontalDistance <= 1 && verticalDistance <= 1) {
+                    piecesInCheck.push(tile.piece);
+                }
             }
         });
-        return inCheck;
+        return piecesInCheck;
     }
 
     /**
@@ -160,10 +167,7 @@ export class King extends Piece {
             move: number[],
             game: Game
         ) => {
-            const gameSimulationAfterMove = game.simulateMove(piece, move);
-            return gameSimulationAfterMove
-                .getKing(this.team)
-                .isInCheck(gameSimulationAfterMove);
+            return game.simulateMove(piece, move).isInCheck(this.team);
         };
 
         // Bruteforce implementation

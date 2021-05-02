@@ -1,69 +1,71 @@
-import {Game} from "../../domain/Game";
-import React from "react";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {Piece, Team} from "../../domain/Piece";
-import {Tile} from "../../domain/Tile";
+import { Game } from '../../domain/Game';
+import React from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Piece, Team } from '../../domain/Piece';
+import { Tile } from '../../domain/Tile';
 
 
-const Cell = ({children, style}: any) => <div style={{
+const Cell = ({ children, style }: any) => <div style={{
     width: '50px',
     height: '50px',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
     ...style
-}} children={children}/>
+}} children={children} />;
 
 
 const ColumnLabels = () => {
     const labels = [
         'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'
-    ]
-    return <div style={{display: "flex"}}>
-        <Cell/>
+    ];
+    return <div style={{ display: 'flex' }}>
+        <Cell />
         {labels.map((label, idx) => <Cell key={idx}>{label}</Cell>)}
-        <Cell/>
-    </div>
+        <Cell />
+    </div>;
 };
 
-const RowLabel = ({idx}: any) => <Cell>{idx + 1}</Cell>;
+const RowLabel = ({ idx }: any) => <Cell>{8 - idx}</Cell>;
 
-const PieceIcon = ({piece, onClick, style}: any) => {
+const PieceIcon = ({ piece, onClick, style }: any) => {
     if (piece !== null) {
         // @ts-ignore
-        return <FontAwesomeIcon onClick={onClick} icon={piece.icon} style={{color: piece.team, ...style}}/>
+        return <FontAwesomeIcon onClick={onClick} icon={piece.icon} style={{ color: piece.team, ...style }} />;
     }
     return null;
-}
+};
 
-const GameTile = ({tile, possibleMoves, onTileClick}: any) => {
+const GameTile = ({ tile, possibleMoves, isSelected, onTileClick }: any) => {
     const isPossibleMove = possibleMoves?.find((x: number[][]) => x[0] === tile.coords[0] && x[1] === tile.coords[1]);
     const hasPiece = tile.piece !== null;
 
     return <div style={{
         width: '50px',
         height: '50px',
-        border: isPossibleMove ? '1px solid white' : '1px solid transparent',
+        border: isPossibleMove ? '1px solid white' : (isSelected) ? '1px solid purple' : '1px solid transparent',
         display: 'flex',
+        flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
         color: tile.piece?.team,
-        background: ((tile.coords[0] + tile.coords[1]) % 2 === 0) ? '#666666' : 'transparent',
+        background: ((tile.coords[0] + tile.coords[1]) % 2 === 0) ? 'transparent' : '#666666',
         cursor: hasPiece || isPossibleMove ? 'pointer' : ''
     }} onClick={() => onTileClick(tile)}>
-        <PieceIcon piece={tile.piece}/>
-    </div>
-}
+        <PieceIcon piece={tile.piece} />
+        <div style={{ fontSize: 9 }}>({`${tile.x},${tile.y}`})</div>
+    </div>;
+};
 
-const CapturedArea = ({capturedPieces, currentTeam, isPromotion, onPieceClick}: any) => <div
-    style={{display: "flex", marginBottom: '20px', marginTop: '20px'}}>
+const CapturedArea = ({ capturedPieces, currentTeam, isPromotion, onPieceClick }: any) => <div
+    style={{ display: 'flex', marginBottom: '20px', marginTop: '20px' }}>
     {capturedPieces.map((piece: Piece, idx: number) =>
         <PieceIcon
-            style={{cursor: (piece.team === currentTeam && isPromotion) ? 'pointer' : ''}}
+            style={{ cursor: (piece.team === currentTeam && isPromotion) ? 'pointer' : '' }}
             onClick={() => onPieceClick(piece)} key={idx}
-            piece={piece}/>
+            piece={piece} />
     )}
-</div>
+</div>;
 
 
 interface IGridProps {
@@ -83,7 +85,8 @@ const Grid: React.FC<IGridProps> = ({
                                         onTileClick,
                                         onCapturedPieceClick
                                     }) => {
-    const selectedPieceMoves = selectedTile?.piece?.moves(game);
+
+    const selectedPieceMoves = (selectedTile !== undefined && selectedTile?.piece !== null) ? game.getAllowedMoves(selectedTile.piece) : [];
 
     return <div>
         <CapturedArea
@@ -92,19 +95,23 @@ const Grid: React.FC<IGridProps> = ({
             currentTeam={currentTeam}
             onPieceClick={onCapturedPieceClick}
         />
-        <div style={{border: '2px solid #666666'}}>
-            <ColumnLabels/>
+        <div style={{ border: '2px solid #666666' }}>
+            <ColumnLabels />
             {game.rows.reverse().map((row, rowIdx) => <>
-                <div style={{display: "flex"}} key={rowIdx}>
-                    <RowLabel idx={rowIdx}/>
+                <div style={{ display: 'flex' }} key={rowIdx}>
+                    <RowLabel idx={rowIdx} />
                     {row.map((tile, colIdx) =>
-                        <GameTile key={colIdx} tile={tile} possibleMoves={selectedPieceMoves}
-                                  onTileClick={onTileClick}/>
+                        <GameTile key={colIdx}
+                                  tile={tile}
+                                  possibleMoves={selectedPieceMoves}
+                                  onTileClick={onTileClick}
+                                  isSelected={selectedTile === tile}
+                        />
                     )}
-                    <RowLabel idx={rowIdx}/>
+                    <RowLabel idx={rowIdx} />
                 </div>
             </>)}
-            <ColumnLabels/>
+            <ColumnLabels />
         </div>
         <CapturedArea
             capturedPieces={game.getTeamCapturedPieces(Team.white)}
@@ -112,7 +119,7 @@ const Grid: React.FC<IGridProps> = ({
             currentTeam={currentTeam}
             onPieceClick={onCapturedPieceClick}
         />
-    </div>
+    </div>;
 };
 
 
