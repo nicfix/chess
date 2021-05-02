@@ -52,7 +52,6 @@ const GameTile = ({ tile, possibleMoves, isSelected, onTileClick }: any) => {
         cursor: hasPiece || isPossibleMove ? 'pointer' : ''
     }} onClick={() => onTileClick(tile)}>
         <PieceIcon piece={tile.piece} />
-        <div style={{ fontSize: 9 }}>({`${tile.x},${tile.y}`})</div>
     </div>;
 };
 
